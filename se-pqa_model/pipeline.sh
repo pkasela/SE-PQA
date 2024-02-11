@@ -50,11 +50,33 @@ python fuse_optimizer.py --data_folder $DATA_FOLDER --model_path $SAVED_MODEL --
 
 
 SEED=0
-MODEL_NAME="castorini/monot5-base-msmarco-10k"
+MODEL_NAME="castorini/monot5-small-msmarco-10k"
 LR=1e-3
-OUTPUT_DIR='./t5_sepqa_new_len_model_base'
+OUTPUT_DIR='./t5_sepqa_new_len_model_small'
 REDUCTION_FACTOR=48
 BATCH=64
 
 python training_t5_adapter.py --data_folder $DATA_FOLDER --num_epochs $EPOCH --batch_size $BATCH --seed $SEED --model_name $MODEL_NAME --lr $LR --output_dir $OUTPUT_DIR --reduction_factor $REDUCTION_FACTOR
-python testing_t5_adapter.py 
+
+SEED=42
+SPLIT='val'
+python testing_t5_adapter.py --data_folder $DATA_FOLDER --model_path $OUTPUT_DIR --split $SPLIT --seed $SEED
+SPLIT='test'
+python testing_t5_adapter.py --data_folder $DATA_FOLDER --model_path $OUTPUT_DIR --split $SPLIT --seed $SEED
+
+python fuse_optimizer_t5.py --data_folder $DATA_FOLDER --model_name $OUTPUT_DIR --mode 'base'
+python fuse_optimizer_t5.py --data_folder $DATA_FOLDER --model_name $OUTPUT_DIR --mode 'pers'
+
+MODEL_NAME="castorini/monot5-base-msmarco-10k"
+OUTPUT_DIR='./t5_sepqa_new_len_model_base'
+
+python training_t5_adapter.py --data_folder $DATA_FOLDER --num_epochs $EPOCH --batch_size $BATCH --seed $SEED --model_name $MODEL_NAME --lr $LR --output_dir $OUTPUT_DIR --reduction_factor $REDUCTION_FACTOR
+
+SEED=42
+SPLIT='val'
+python testing_t5_adapter.py --data_folder $DATA_FOLDER --model_path $OUTPUT_DIR --split $SPLIT --seed $SEED
+SPLIT='test'
+python testing_t5_adapter.py --data_folder $DATA_FOLDER --model_path $OUTPUT_DIR --split $SPLIT --seed $SEED
+
+python fuse_optimizer_t5.py --data_folder $DATA_FOLDER --model_name $OUTPUT_DIR --mode 'base'
+python fuse_optimizer_t5.py --data_folder $DATA_FOLDER --model_name $OUTPUT_DIR --mode 'pers'

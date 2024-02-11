@@ -16,28 +16,10 @@ logging.basicConfig(filename=join('../logs', 'answer_fusion.log'),
 
 logger = logging.getLogger(__name__)
 
-
-@click.command()
-@click.option(
-    "--data_folder",
-    type=str,
-    required=True
-)
-@click.option(
-    "--model_path",
-    type=str,
-    required=True
-)
-@click.option(
-    "--mode",
-    type=str,
-    required=True
-)
-def main(data_folder, model_path, mode):
+def test_t5_tag(data_folder, model_name, mode):
     assert mode in ['base', 'pers'], "model can only be base or pers"
-    model_epoch = int(model_path.replace('.pt', '').split('_')[-1]) if model_path else 0
-
-    logger.info(f'Model name: {model_path}, mode: {mode}')
+    
+    logger.info(f'Model name: {model_name}, mode: {mode}')
     logger.info('Creating Validation and Test Qrels')
 
     if mode == "base":
@@ -55,15 +37,15 @@ def main(data_folder, model_path, mode):
     
     
     split = 'val'
-
+    
     logger.info('Reading Validation Runs')
-    with open(join(data_folder, f'{split}/bert_run_{model_epoch}_rerank.json'), 'r') as f:
-        bert_run = json.load(f)
+    with open(join(data_folder, f'{split}/{model_name.replace("/","_")}_rerank.json'), 'r') as f:
+        t5_run = json.load(f)
     if mode == 'pers':
-        bert_run = {q: bert_run[q] for q in bert_run if q in val_qrels}
-    bert_run = Run(bert_run, name='BERT')
+        t5_run = {q: t5_run[q] for q in t5_run if q in val_qrels}
+    t5_run = Run(t5_run, name='T5')
 
-    with open(join(data_folder, f'{split}/tag_run.json'), 'r') as f:
+    with open(join(data_folder, f'{split}/tag_set_run.json'), 'r') as f:
         tag_run = json.load(f)
     if mode == 'pers':
         tag_run = {q: tag_run[q] for q in tag_run if q in val_qrels}
@@ -80,7 +62,7 @@ def main(data_folder, model_path, mode):
     logger.info('Optimizing on validation')
     all_best_params = optimize_fusion(
         qrels=val_qrels,
-        runs=[bm25_run, bert_run, tag_run],
+        runs=[bm25_run, t5_run, tag_run],
         norm="min-max",
         method="wsum",
         metric="ndcg@10",  # The metric to maximize during optimization
@@ -89,7 +71,7 @@ def main(data_folder, model_path, mode):
 
     bm25_bert_best_params = optimize_fusion(
         qrels=val_qrels,
-        runs=[bm25_run, bert_run],
+        runs=[bm25_run, t5_run],
         norm="min-max",
         method="wsum",
         metric="ndcg@10",  # The metric to maximize during optimization
@@ -106,27 +88,30 @@ def main(data_folder, model_path, mode):
     )
 
     logger.info(f'best parameters with all three: {all_best_params[0]}')
-    #logger.info(f'\n{all_best_params[1]}')
+    logger.info(f'\n{all_best_params[1]}')
 
 
     logger.info(f'best parameters with bm25 and bert: {bm25_bert_best_params[0]}')
-    #logger.info(f'\n{bm25_bert_best_params[1]}')
+    logger.info(f'\n{bm25_bert_best_params[1]}')
 
     logger.info(f'best parameters with bm25 and tag: {bm25_tag_best_params[0]}')
-    #logger.info(f'\n{bm25_tag_best_params[1]}')
-
+    logger.info(f'\n{bm25_tag_best_params[1]}')
+    
+    # all_best_params = ({'weights': (0., 1, 0)}, [])
+    # bm25_bert_best_params = ({'weights': (0, 1)}, [])
+    # bm25_tag_best_params = ({'weights': (0.7, 0.3)}, [])
     logger.info('Reading test run.')
     split = 'test'
 
-    with open(join(data_folder, f'{split}/bert_run_{model_epoch}_rerank.json'), 'r') as f:
-        bert_run = json.load(f)
+    with open(join(data_folder, f'{split}/{model_name.replace("/","_")}_rerank.json'), 'r') as f:
+        t5_run = json.load(f)
     if mode == 'pers':
-        bert_run = {q: bert_run[q] for q in bert_run if q in test_qrels}
-    bert_run = Run(bert_run, name='BERT')
-    logger.info('Read BERT run')
+        t5_run = {q: t5_run[q] for q in t5_run if q in test_qrels}
+    t5_run = Run(t5_run, name='T5')
+    logger.info('Read T5 run')
 
 
-    with open(join(data_folder, f'{split}/tag_run.json'), 'r') as f:
+    with open(join(data_folder, f'{split}/tag_set_run.json'), 'r') as f:  #tag_embedding_run, tag_run tag_embedding_den_run
         tag_run = json.load(f)
     if mode == 'pers':
         tag_run = {q: tag_run[q] for q in tag_run if q in test_qrels}
@@ -146,25 +131,25 @@ def main(data_folder, model_path, mode):
     logger.info('Test Qrels Created')
 
     all_combined_test_run = fuse(
-        runs=[bm25_run, bert_run, tag_run],
-        norm="min-max",
-        method="wsum",
+        runs=[bm25_run, t5_run, tag_run],  
+        norm="min-max",       
+        method="wsum",        
         params=all_best_params[0],
     )
-    all_combined_test_run.name = 'BM25 + BERT + TAG'
-
+    all_combined_test_run.name = 'BM25 + T5 + TAG'
+    
     bm25_bert_combined_test_run = fuse(
-        runs=[bm25_run, bert_run],
-        norm="min-max",
-        method="wsum",
+        runs=[bm25_run, t5_run],  
+        norm="min-max",       
+        method="wsum",        
         params=bm25_bert_best_params[0],
     )
-    bm25_bert_combined_test_run.name = 'BM25 + BERT'
+    bm25_bert_combined_test_run.name = 'BM25 + T5'
     
     bm25_tag_combined_test_run = fuse(
-        runs=[bm25_run, tag_run],
-        norm="min-max",
-        method="wsum",
+        runs=[bm25_run, tag_run],  
+        norm="min-max",       
+        method="wsum",        
         params=bm25_tag_best_params[0],
     )
     bm25_tag_combined_test_run.name = 'BM25 + TAG'
@@ -175,7 +160,7 @@ def main(data_folder, model_path, mode):
 
     models = [
         bm25_run,
-        bert_run, 
+        t5_run, 
         tag_run, 
         bm25_tag_combined_test_run, 
         bm25_bert_combined_test_run, 
@@ -191,6 +176,26 @@ def main(data_folder, model_path, mode):
     )
     logger.info(f'\n{report}')
     print(report)
+
+@click.command()
+@click.option(
+    "--data_folder",
+    type=str,
+    required=True
+)
+@click.option(
+    "--model_name",
+    type=str,
+    required=True
+)
+@click.option(
+    "--mode",
+    type=str,
+    required=True
+)
+def main(data_folder, model_name, mode):
+    model_name = model_name.replace('/', '_')
+    test_t5_tag(data_folder, model_name, mode)
 
 if __name__ == "__main__":
     main()
