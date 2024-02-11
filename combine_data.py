@@ -41,7 +41,6 @@ def community_data(community):
                         'LastActivityDate', 'ContentLicense', 'ClosedDate',
                         'LastEditorDisplayName', 'OwnerDisplayName', 'CommunityOwnedDate'], axis=1)
     
-    # df_posts = df_posts.dropna(subset=['OwnerUserId']) # deleted users
     df_posts = df_posts.merge(users[['Id', 'AccountId']], left_on='OwnerUserId', right_on='Id', suffixes=('','_'), how='left')
     df_posts['Id'] = df_posts['Id'].apply(lambda x: f'{community_id}_{x}')
     df_posts['AcceptedAnswerId'] = df_posts['AcceptedAnswerId'].apply(lambda x: x if pd.isna(x) else f'{community_id}_{x}')
@@ -60,7 +59,6 @@ def community_data(community):
     all_questions['Body'] = all_questions['Body'].apply(cleanhtml)
     all_questions['Title'] = all_questions['Title'].apply(cleanhtml)
     all_questions['Community'] = community_id
-    # all_questions.dropna(subset=['OwnerUserId'])
     all_questions = all_questions.drop(['ParentId', 'PostTypeId', 'Id_', 'OwnerUserId'], axis=1)
 
     comments = pd.DataFrame(xml_to_dict(os.path.join(community, 'Comments.xml')))
@@ -166,7 +164,6 @@ def main():
         "anime",
         "academia"
     ]    
-    # all_communities = ["writers"]
     all_data_dict = {
         'answered_post': [], 
         'all_answers': [], 
@@ -178,7 +175,6 @@ def main():
         }
     all_communities = [os.path.join('raw_data', comm) for comm in all_communities]
     for comm in all_communities:
-        # community_stats(comm)
         logging.info(f'Reading {comm}')
         answered_post, all_answers, all_questions, users, comments, postlinks, tags = community_data(comm)
         all_data_dict['answered_post'].append(answered_post)
@@ -196,7 +192,6 @@ def main():
     comments = pd.concat(pd.DataFrame(df) for df in all_data_dict['comments'])
     postlinks = pd.concat(pd.DataFrame(df) for df in all_data_dict['postlinks'])
     tags = pd.concat(pd.DataFrame(df) for df in all_data_dict['tags'])
-    # stats_print(answered_post, all_answers, all_questions, users, comments)
 
     os.makedirs('dataset', exist_ok=True)
     answered_post.to_csv('dataset/questions_with_answer.csv', index=None)
