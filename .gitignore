@@ -1,0 +1,13 @@
+*.pt
+.ipynb_checkpoints
+*.ipynb
+*.png
+*.jpg
+*.csv
+__pycache__
+raw_data
+dataset
+*.json
+logs
+pd_index*
+created_data

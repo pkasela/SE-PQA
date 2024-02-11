@@ -1,0 +1,31 @@
+{
+	"settings": {
+		"number_of_shards": 1,
+		"number_of_replicas": 1,
+		"similarity": {
+            "dynamicBM25": {
+                "type": "BM25",
+                "b": "0.3",
+                "k1": "1.2"
+              }
+        }
+	},
+	"mappings": {
+	    "properties": {
+			"text_id": {
+			    "type": "long"
+			},
+			"text": {
+				"type": "text",
+                "similarity": "dynamicBM25" 
+			},
+			"bert_embedding": {
+			  "type": "dense_vector",
+			  "dims": 768
+			},
+			"year": {
+			  "type": "short"
+			}
+	    }
+	}
+}
