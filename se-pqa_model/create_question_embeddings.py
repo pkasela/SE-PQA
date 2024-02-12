@@ -5,10 +5,9 @@ import os
 import click
 import torch
 import tqdm
-from transformers import AutoModel, AutoTokenizer
-
 from dataloader.utils import seed_everything
 from model.model import BiEncoder
+from transformers import AutoModel, AutoTokenizer
 
 logger = logging.getLogger(__name__)
 

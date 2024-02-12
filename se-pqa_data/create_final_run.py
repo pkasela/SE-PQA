@@ -1,7 +1,9 @@
 import json
 from os.path import join
+
 import click
 from tqdm import tqdm
+
 
 def load_jsonl(file: str):
     with open(file, 'r') as f:

@@ -1,9 +1,11 @@
 import json
+from os import makedirs
+from os.path import join
+
 import click
 import pandas as pd
 from tqdm import tqdm
-from os.path import join
-from os import makedirs
+
 
 def create_and_save_collection(df, out_name):
     collection = {row['Id']: row['Text'] for id, row in tqdm(df.iterrows(), 

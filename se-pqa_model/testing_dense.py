@@ -5,11 +5,10 @@ import os
 import click
 import torch
 import tqdm
-from ranx import Qrels, Run, compare
-from transformers import AutoModel, AutoTokenizer
-
 from dataloader.utils import load_test_query, seed_everything
 from model.model import BiEncoder
+from ranx import Qrels, Run, compare
+from transformers import AutoModel, AutoTokenizer
 
 logger = logging.getLogger(__name__)
 

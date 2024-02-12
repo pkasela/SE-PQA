@@ -1,32 +1,19 @@
-# T5_adapterhub
-
-#from datasets import load_dataset
-from transformers import T5ForConditionalGeneration, T5Tokenizer
-from transformers import T5ForConditionalGeneration
-import click
-from adapters import BnConfig, init
-import torch
-from transformers import AdamW
-import os
-from os.path import join
+import json
 import logging
+import os
 from os import makedirs
-from torch import cuda
-from torch.utils.data import DataLoader
+from os.path import join
+
+import click
+import torch
+from adapters import BnConfig, init
 from dataloader.dataloader import StarQuestionData, in_batch_negative_collate_fn_bm25_t5
 from dataloader.utils import load_query_data, seed_everything
-import json
-import os
-os.environ['WANDB_DISABLED'] = 'true'
+from torch import cuda
+from torch.utils.data import DataLoader
+from transformers import AdamW, T5ForConditionalGeneration
 
-# data_folder = '../../answer_retrieval'
-# num_epochs = 10
-# seed = 0
-# model_name = "castorini/monot5-base-msmarco-10k"
-# lr=1e-3
-# output_dir = './t5_sepqa_new_len_model_base'
-# reduction_factor = 48
-# batch_size = 64
+os.environ['WANDB_DISABLED'] = 'true'
 
 @click.command()
 @click.option(
@@ -90,9 +77,6 @@ def main(data_folder, num_epochs, batch_size, seed, model_name, lr, output_dir, 
     train_query_data = load_query_data(join(data_folder, 'train/queries.jsonl'))
     val_query_data = load_query_data(join(data_folder, 'val/queries.jsonl'))
 
-    tokenizer = T5Tokenizer.from_pretrained(model_name, return_tensors = 'pt')
-
-    # 128 batch
     train_data = DataLoader(
         StarQuestionData(train_query_data, corpus),
         batch_size=batch_size,
@@ -117,14 +101,13 @@ def main(data_folder, num_epochs, batch_size, seed, model_name, lr, output_dir, 
     # Activate adapter for training
     model.train_adapter("t5_qa")
 
-    for n,p in model.named_parameters():
-        if p.requires_grad == True:
+    for _, p in model.named_parameters():
+        if p.requires_grad is True:
             print(p)
 
-    loss_f = torch.nn.CrossEntropyLoss()
-    model.to(device)
+    model = model.to(device)
 
-    optimizer = AdamW([p for p in model.parameters() if p.requires_grad==True], lr=lr)
+    optimizer = AdamW([p for p in model.parameters() if p.requires_grad is True], lr=lr)
 
     loss_history = []
     for epoch in range(num_epochs):

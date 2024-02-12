@@ -1,10 +1,10 @@
-import logging
-from elasticsearch import Elasticsearch
-from elasticsearch.helpers import parallel_bulk, bulk
-from collections import deque
-
 import json
-from typing import List, Dict, Union, Optional, Type, Any
+import logging
+from collections import deque
+from typing import Any, Dict, List, Optional, Type, Union
+
+from elasticsearch import Elasticsearch
+from elasticsearch.helpers import bulk, parallel_bulk
 
 logger = logging.getLogger(__name__)
 

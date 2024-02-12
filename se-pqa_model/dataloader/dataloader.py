@@ -1,8 +1,9 @@
 import random
-from torch.utils.data import Dataset
+
 import torch
+from torch.utils.data import Dataset
 from transformers import T5Tokenizer
-import random 
+
 
 class QuestionData(Dataset):
     def __init__(self, data, answer_collection):

@@ -1,10 +1,11 @@
 import torch
 from torch import clamp as t_clamp
-from torch import nn
-from torch import tensor
-from torch import sum as t_sum
 from torch import max as t_max
+from torch import nn
+from torch import sum as t_sum
+from torch import tensor
 from torch.nn import functional as F
+
 
 class BiEncoder(nn.Module):
     def __init__(self, doc_model, tokenizer, device, mode='mean'):

@@ -4,13 +4,12 @@ import multiprocessing as mp
 import random
 from functools import partial
 from os import path
-import numpy as np
+
 import click
-from ranx import Qrels, Run, evaluate
-
+import numpy as np
 import tqdm
-
 from elastic import ElasticEngine
+from ranx import Qrels, Run, evaluate
 
 logging.basicConfig(
     filename=path.join('../logs', 'optimize_bm25.log'),

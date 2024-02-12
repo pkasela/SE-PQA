@@ -2,10 +2,9 @@ import json
 import logging
 import random
 from os import path
+
 import click
-
 import tqdm
-
 from elastic import ElasticEngine
 
 logging.basicConfig(

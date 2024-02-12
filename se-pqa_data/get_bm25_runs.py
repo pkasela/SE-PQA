@@ -4,10 +4,9 @@ import multiprocessing as mp
 import random
 from functools import partial
 from os import path
+
 import click
-
 import tqdm
-
 from elastic import ElasticEngine
 
 logging.basicConfig(

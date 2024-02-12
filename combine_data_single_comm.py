@@ -1,11 +1,12 @@
 import html
 import logging
 import os
+import re
 import xml.etree.ElementTree as ET
 from typing import Dict, List, Union
 
-import pandas as pd
 import click
+import pandas as pd
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
@@ -21,7 +22,6 @@ def xml_to_dict(path: Union[str, os.PathLike]) -> List[Dict]:
     return [{key: row.get(key) for key in row.keys()} for row in xml_root]
 
 
-import re
 # as per recommendation from @freylis, compile once only
 CLEANR = re.compile('<.*?>')
 

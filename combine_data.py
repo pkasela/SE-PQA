@@ -1,6 +1,7 @@
 import html
 import logging
 import os
+import re
 import xml.etree.ElementTree as ET
 from typing import Dict, List, Union
 
@@ -19,8 +20,6 @@ def xml_to_dict(path: Union[str, os.PathLike]) -> List[Dict]:
 
     return [{key: row.get(key) for key in row.keys()} for row in xml_root]
 
-
-import re
 # as per recommendation from @freylis, compile once only
 CLEANR = re.compile('<.*?>')
 

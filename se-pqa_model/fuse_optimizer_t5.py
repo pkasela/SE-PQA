@@ -1,11 +1,10 @@
+import json
 import logging
 from os.path import join
-import json
 
 import click
-from ranx import Qrels, Run, compare, fuse, optimize_fusion
-
 from dataloader.utils import load_test_query
+from ranx import Qrels, Run, compare, fuse, optimize_fusion
 
 logging.basicConfig(filename=join('../logs', 'answer_fusion.log'),
                     filemode='a',

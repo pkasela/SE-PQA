@@ -1,21 +1,23 @@
 import json
 import logging
-from os.path import join
 from os import makedirs
+from os.path import join
 
 import click
 import numpy as np
-from torch import cuda, no_grad, save, load
-from torch.utils.data import DataLoader
-from torch.optim import AdamW
-from tqdm import tqdm
-from transformers import AutoModel, AutoTokenizer
-
-from dataloader.dataloader import StarQuestionData, QuestionData, in_batch_negative_collate_fn
+from dataloader.dataloader import (
+    QuestionData,
+    StarQuestionData,
+    in_batch_negative_collate_fn,
+)
 from dataloader.utils import load_query_data, load_test_query, seed_everything
 from model.loss import TripletMarginLoss
 from model.model import BiEncoder
-
+from torch import cuda, load, no_grad, save
+from torch.optim import AdamW
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from transformers import AutoModel, AutoTokenizer
 
 logger = logging.getLogger(__name__)
 

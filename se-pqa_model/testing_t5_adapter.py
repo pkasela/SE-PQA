@@ -6,12 +6,12 @@ import os
 
 import click
 import torch
-from ranx import Qrels, Run, compare
-from transformers import AutoTokenizer, T5ForConditionalGeneration
+import tqdm
+from adapters import init
 from dataloader.utils import load_test_query, seed_everything
 from model.model import T5Ranker
-from adapters import init
-import tqdm
+from ranx import Qrels, Run, compare
+from transformers import AutoTokenizer, T5ForConditionalGeneration
 
 logger = logging.getLogger(__name__)
 torch.backends.cudnn.benchmark = True

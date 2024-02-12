@@ -7,8 +7,9 @@ from multiprocessing import Pool
 import click
 import pandas as pd
 import tqdm
-from ranx import Qrels, Run, compare
 from dataloader.utils import load_test_query, seed_everything
+from ranx import Qrels, Run, compare
+
 logger = logging.getLogger(__name__)
 
 

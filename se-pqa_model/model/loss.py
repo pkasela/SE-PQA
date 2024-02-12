@@ -1,6 +1,7 @@
 from torch import einsum, nn
 from torch.nn.functional import relu
 
+
 class TripletMarginLoss(nn.Module):
     """
     Triplet Margin Loss function.

@@ -1,7 +1,8 @@
+import click
 import torch
 from model.model import BiEncoder
 from transformers import AutoModel, AutoTokenizer
-import click
+
 
 @click.command()
 @click.option(
