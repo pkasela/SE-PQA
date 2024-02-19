@@ -76,12 +76,20 @@ def community_data(community):
     postlinks = postlinks.drop('LinkTypeId', axis=1)
 
     tags = pd.DataFrame(xml_to_dict(os.path.join(community, 'Tags.xml')))
-    tags['PostId'] = tags.ExcerptPostId.fillna(tags.WikiPostId)
+    tags['PostId'] = tags.WikiPostId.fillna(tags.ExcerptPostId) # tags.ExcerptPostId.fillna(tags.WikiPostId)
     tags = tags.dropna()
-    tags = tags.drop(['ExcerptPostId', 'WikiPostId'], axis=1)
     tags.PostId = tags.PostId.apply(lambda x: f'{community_id}_{x}')
-    tags = tags.merge(df_posts[['Id', 'Body']], left_on='PostId', right_on='Id', suffixes=('', '_'))
-    tags = tags.drop('Id_', axis=1)
+    tags.WikiPostId = tags.WikiPostId.apply(lambda x: f'{community_id}_{x}')
+    tags.ExcerptPostId = tags.ExcerptPostId.apply(lambda x: f'{community_id}_{x}')
+    
+    tags['Body'] = ''
+    tags = tags.merge(df_posts[['Id', 'Body']], left_on='ExcerptPostId', right_on='Id', suffixes=('', '_Excerpt'))
+    tags = tags.drop('Id_Excerpt', axis=1)
+    tags = tags.merge(df_posts[['Id', 'Body']], left_on='WikiPostId', right_on='Id', suffixes=('', '_Wiki'))
+    tags = tags.drop('Id_Wiki', axis=1)
+    tags.Body_Excerpt = tags.Body_Excerpt.apply(cleanhtml)
+    tags.Body_Wiki = tags.Body_Wiki.apply(cleanhtml)
+    tags.Body = tags.Body_Excerpt + ' ' + tags.Body_Wiki
     tags.Body = tags.Body.apply(cleanhtml)
     tags['Community'] = community_id
     
