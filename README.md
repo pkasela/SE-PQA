@@ -1,5 +1,10 @@
 # SE-PQA: a Resource for Personalized Community Question Answering
 
+## Paper Links: 
+
+[WWW Web Conference 2024](https://dl.acm.org/doi/abs/10.1145/3589335.3651445)
+[Arxiv](https://arxiv.org/abs/2306.16261)
+
 ## To create the datset
 
 The dataset is provided already processed on Zenodo: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10679181.svg)](https://doi.org/10.5281/zenodo.10679181)
